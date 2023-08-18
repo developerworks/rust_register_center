@@ -1,5 +1,6 @@
 // filename: main.rs
 
+mod config;
 mod discovery;
 mod registry;
 mod rest_api;

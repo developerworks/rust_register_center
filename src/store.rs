@@ -86,8 +86,11 @@ mod tests {
     fn test_store_get_not_found() {
         let store = Store::new();
 
-        let result = matches!(store.get("service", "key"), None);
-        assert!(result);
+        let result = match store.get("service", "key").unwrap() {
+            ConfigValue::None => true,
+            _ => false,
+        };
+        assert_eq!(result, true)
     }
 
     #[test]
