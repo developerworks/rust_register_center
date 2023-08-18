@@ -5,6 +5,7 @@ use std::sync::{Arc, RwLock};
 use actix_web::{get, post, web, HttpResponse, Responder};
 
 use crate::{
+    discovery::ServiceDiscovery,
     registry::{Registry, ServiceInstance},
     store::Store,
 };
@@ -24,8 +25,8 @@ async fn register(
 }
 
 #[get("/registry/{name}")]
-async fn query(registry: web::Data<Registry>, name: web::Path<String>) -> impl Responder {
-    let instances: Vec<ServiceInstance> = registry.query(&name);
+async fn query(discovery: web::Data<ServiceDiscovery>, name: web::Path<String>) -> impl Responder {
+    let instances = discovery.query(&name);
 
     web::Json(instances)
 }
@@ -44,4 +45,3 @@ async fn get_config(
         None => web::Json(crate::store::ConfigValue::String("".to_string())),
     }
 }
-

@@ -6,6 +6,7 @@ mod rest_api;
 mod store;
 
 use actix_web::{web, App, HttpServer};
+use discovery::ServiceDiscovery;
 use futures::join;
 use registry::Registry;
 use store::Store;
@@ -14,7 +15,7 @@ use store::Store;
 async fn main() -> std::io::Result<()> {
     let server = HttpServer::new(|| {
         App::new()
-            .app_data(web::Data::new(Registry::new()))
+            .app_data(web::Data::new(ServiceDiscovery::new(Registry::new())))
             .app_data(web::Data::new(Store::new()))
             .service(rest_api::register)
             .service(rest_api::query)
