@@ -80,9 +80,8 @@ mod tests {
     #[test]
     fn test_store_get_not_found() {
         let store = Store::new();
-
-        let result = matches!(store.get("service", "key").unwrap(), ServiceConfigValue::None);
-        assert!(result)
+        let result  = matches!(store.get("service", "key"), None);
+        assert!(result);
     }
 
     #[test]
