@@ -5,14 +5,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct ServiceInstance {
+    /// Service name
     pub name: String,
+    /// Service url, for example a rest api server: https://example.com/api
     pub url: String,
+    /// Other information about the service
     pub metadata: HashMap<String, String>,
 }
 
 impl ServiceInstance {
 
-    #[allow(dead_code)]
+    #[allow(unused)]
     pub fn new(name: String, url: String) -> Self {
         Self {
             name,
@@ -21,7 +24,7 @@ impl ServiceInstance {
         }
     }
 
-    #[allow(dead_code)]
+    #[allow(unused)]
     pub fn with_metadata(self, metadata: HashMap<String, String>) -> Self {
         Self {
             name: self.name,
