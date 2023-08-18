@@ -40,10 +40,10 @@ mod tests {
         let event_name = "test_event";
         let data = "test_data";
 
-        let rx = events.subscribe(event_name).await;
+        let mut rx = events.subscribe(event_name).await;
         events.publish(event_name, data).await;
 
-        // Use tokio's timeout to allow time for the message to be received
+        // Use tokio's timeout to await the result of receiving data
         let received_data = time::timeout(Duration::from_secs(1), rx.recv()).await;
 
         assert!(received_data.is_ok());
