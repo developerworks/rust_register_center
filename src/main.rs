@@ -2,11 +2,12 @@
 
 mod config;
 mod discovery;
+mod events;
+mod logger;
 mod registry;
 mod rest_api;
-mod store;
 mod service_configuration;
-mod events;
+mod store;
 
 use actix_web::{web, App, HttpServer};
 use discovery::ServiceDiscovery;

@@ -1,17 +1,20 @@
-// filename: logger.rs 
+// filename: logger.rs
 
-use log::{info, error};
+use log::{error, info};
+use simplelog::{self, Config, LevelFilter};
 
+#[allow(unused)]
 pub fn init_logger() {
-  simplelog::SimpleLogger::new()
-    .with_level(log::LevelFilter::Info)
-    .init();  
+    simplelog::SimpleLogger::new(LevelFilter::Info, Config::default());
+    info!("Logger initialized");
 }
 
+#[allow(unused)]
 pub fn log_info(msg: &str) {
-  info!("{}", msg);
+    info!("{}", msg);
 }
 
+#[allow(unused)]
 pub fn log_error(msg: &str) {
-  error!("{}", msg);
+    error!("{}", msg);
 }
