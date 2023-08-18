@@ -2,7 +2,7 @@
 
 mod discovery;
 mod registry;
-mod server;
+mod rest_api;
 mod store;
 
 use actix_web::{web, App, HttpServer};
@@ -16,9 +16,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(Registry::new()))
             .app_data(web::Data::new(Store::new()))
-            .service(server::register)
-            .service(server::query)
-            .service(server::get_config)
+            .service(rest_api::register)
+            .service(rest_api::query)
+            .service(rest_api::get_config)
         // 其他接口
     })
     .bind("127.0.0.1:8080")?;

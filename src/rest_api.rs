@@ -2,10 +2,10 @@
 
 use std::sync::{Arc, RwLock};
 
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, web, HttpResponse, Responder};
 
 use crate::{
-    registry::{self, Registry, ServiceInstance},
+    registry::{Registry, ServiceInstance},
     store::Store,
 };
 
@@ -45,16 +45,3 @@ async fn get_config(
     }
 }
 
-#[actix_rt::main]
-pub async fn serve(registry: registry::Registry) -> std::io::Result<()> {
-    HttpServer::new(move || {
-        App::new()
-            .app_data(Arc::new(RwLock::new(registry.clone()))) // Pass a cloned Arc<RwLock<Registry>> to each worker
-            .service(register) // Add your routes here
-            .service(query)
-            .service(get_config)
-    })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
-}
