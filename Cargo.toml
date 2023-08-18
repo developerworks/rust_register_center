@@ -11,6 +11,7 @@ actix-web = "4.3.1"
 clap = { version = "4.3.22", features = ["derive"] }
 etcd = "0.9.0"
 etcd-client = "0.11.1"
+futures = "0.3.28"
 reqwest = { version = "0.11.18", features = ["json"] }
 serde = { version = "1.0.183", features = ["derive"] }
 tokio = { version = "1.32.0", features = ["full"] }

@@ -4,6 +4,9 @@ pub mod service_instance;
 use std::collections::HashMap;
 
 pub use service_instance::ServiceInstance;
+
+/// Service registry:
+/// A hash table, it's element key is service name, element value is a collection of service instances.
 pub struct Registry {
     services: HashMap<String, Vec<ServiceInstance>>,
 }
@@ -21,7 +24,7 @@ impl Registry {
         }
     }
 
-    // 注册服务实例
+    /// Register a service instance
     #[allow(unused)]
     pub(crate) fn register(&mut self, instance: ServiceInstance) {
         // 先检查是否存在
@@ -37,7 +40,7 @@ impl Registry {
             .push(instance);
     }
 
-    // 查询服务
+    /// Query service instances by service name
     pub fn query(&self, name: &str) -> Vec<ServiceInstance> {
         match self.services.get(name) {
             Some(instances) => instances.to_vec(),
