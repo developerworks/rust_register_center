@@ -10,6 +10,7 @@ pub struct ServiceDiscovery {
 
 impl ServiceDiscovery {
     
+    #[allow(unused)]
     pub fn new(registry: Registry) -> Self {
         Self { registry }
     }

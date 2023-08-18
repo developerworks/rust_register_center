@@ -1,3 +1,5 @@
+use std::{net::IpAddr, ops::RangeInclusive};
+
 use clap::{Parser, Subcommand};
 
 use rust_register_center::registry::ServiceInstance;
@@ -6,7 +8,7 @@ use rust_register_center::registry::ServiceInstance;
 #[derive(Parser)]
 struct Cli {
     /// Service registry endpoint
-    #[arg(short, long, required = true)]
+    #[arg(short, long, required = true, default_value = "http://127.0.0.1:2312")]
     endpoint: String,
 
     /// Service name
@@ -24,13 +26,35 @@ enum Commands {
 
     Register {
         /// Service host name, ip or domain name
-        #[arg(short, long, required = true)]
+        #[arg(short, long, required = true, default_value = "127.0.0.1", value_parser = validate_ip)]
         ipaddr: String,
 
         /// Service listen port
-        #[arg(short, long, required = true)]
+        #[arg(short, long, required = true, value_parser = validate_port)]
         port: u16,
     },
+}
+
+const PORT_RANGE: RangeInclusive<usize> = 1..=65535;
+
+fn validate_port(s: &str) -> Result<u16, String> {
+    let port: usize = s
+        .parse()
+        .map_err(|_| format!("`{}` isn't a port number", s))?;
+
+    if PORT_RANGE.contains(&port) {
+        Ok(port as u16)
+    } else {
+        Err(format!(
+            "Port not in range {} - {}",
+            PORT_RANGE.start(),
+            PORT_RANGE.end()
+        ))
+    }
+}
+
+fn validate_ip(s: &str) -> Result<IpAddr, String> {
+    s.parse().map_err(|e| format!("Invalid IP: {}", e))
 }
 
 #[tokio::main]

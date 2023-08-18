@@ -8,6 +8,12 @@ pub struct Registry {
     services: HashMap<String, Vec<ServiceInstance>>,
 }
 
+impl Default for Registry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Registry {
     pub fn new() -> Self {
         Self {
@@ -16,6 +22,7 @@ impl Registry {
     }
 
     // 注册服务实例
+    #[allow(unused)]
     pub(crate) fn register(&mut self, instance: ServiceInstance) {
         // 先检查是否存在
         if let Some(service) = self.services.get_mut(&instance.name) {
