@@ -42,6 +42,6 @@ async fn get_config(
 
     match value {
         Some(value) => web::Json(value),
-        None => web::Json(crate::store::ConfigValue::String("".to_string())),
+        None => web::Json(crate::store::ServiceConfigValue::String("".to_string())),
     }
 }

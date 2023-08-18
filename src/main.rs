@@ -5,6 +5,7 @@ mod discovery;
 mod registry;
 mod rest_api;
 mod store;
+mod service_configuration;
 
 use actix_web::{web, App, HttpServer};
 use discovery::ServiceDiscovery;
