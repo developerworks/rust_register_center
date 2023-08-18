@@ -1,4 +1,4 @@
-// events.rs
+// filename: events.rs
 
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::{mpsc, Mutex};

@@ -1,9 +1,9 @@
 // filename: registry.rs
 
-pub(crate) mod service_instance;
+pub mod service_instance;
 use std::collections::HashMap;
 
-pub(crate) use service_instance::ServiceInstance;
+pub use service_instance::ServiceInstance;
 pub struct Registry {
     services: HashMap<String, Vec<ServiceInstance>>,
 }

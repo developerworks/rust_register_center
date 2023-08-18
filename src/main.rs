@@ -1,4 +1,4 @@
-// // filename: main.rs
+// filename: main.rs
 
 // mod config;
 // mod registry;
