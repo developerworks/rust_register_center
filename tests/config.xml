@@ -7,4 +7,10 @@
     <password>root</password>
     <db>test</db>
   </database>
+  <redis>
+    <host>localhost</host>
+    <port>6379</port>
+    <db>0</db>
+    <password>root</password>
+  </redis>
 </config>

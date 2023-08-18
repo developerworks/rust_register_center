@@ -7,21 +7,20 @@ use std::fs;
 
 pub use struct_defs::Config;
 
-#[allow(unused)]
+// #[allow(unused)]
 pub static CONFIG_FILE: &str = "tests/config.xml";
-#[allow(unused)]
-pub static CONFIG_FILE_UNEXPECTED_END_OF_STREAM: &str = "tests/config_unexpected_end_of_stream.xml";
-#[allow(unused)]
+
+// #[allow(unused)]
 pub static PROJECT_ROOT: &str = env!("CARGO_MANIFEST_DIR");
 
 #[allow(unused)]
-fn load_config(filename: &str) -> Result<Config, Box<dyn Error>> {
+pub fn load_config(filename: &str) -> Result<Config, Box<dyn Error>> {
     let xml = std::fs::read_to_string(filename)?;
     let config: Config = serde_xml_rs::from_str(&xml)?;
     Ok(config)
 }
 #[allow(unused)]
-fn file_exists(path: &str) -> bool {
+pub fn file_exists(path: &str) -> bool {
     fs::metadata(path).is_ok()
 }
 
@@ -33,6 +32,9 @@ fn file_exists(path: &str) -> bool {
 #[cfg(test)]
 mod tests {
     // Tests for config module
+    // #[allow(unused)]
+    pub static CONFIG_FILE_UNEXPECTED_END_OF_STREAM: &str = "tests/config_unexpected_end_of_stream.xml";   
+         
 
     use super::*;
 
