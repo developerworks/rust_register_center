@@ -1,14 +1,5 @@
 // filename: main.rs
 
-// mod config;
-// mod registry;
-// mod server;
-
-// async fn main() {
-//   let config = config::load_config().await;
-//   let registry = registry::ServiceRegistry::new(&config);
-//   let server = server::serve(registry).await;
-// }
 mod discovery;
 mod registry;
 mod server;
