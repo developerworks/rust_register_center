@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(config_clone.clone()))
             .app_data(web::Data::new(discovery))
             .app_data(web::Data::new(store::Store::new()))
-            .app_data(web::Data::new(events::Events::new))
+            .app_data(web::Data::new(events::default::Events::new))
             .service(rest_api::register)
             .service(rest_api::query)
             .service(rest_api::get_config)

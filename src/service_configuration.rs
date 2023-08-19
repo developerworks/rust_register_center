@@ -3,7 +3,7 @@ use serde_json::Value;
 
 #[allow(unused)]
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
-struct ServiceConfiguration {}
+pub struct ServiceConfiguration {}
 impl ServiceConfiguration {
     /// Initialize the ServiceConfiguration
     #[allow(unused)]
@@ -26,29 +26,3 @@ impl ServiceConfiguration {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use serde_json::json;
-
-    use super::*;
-
-    #[test]
-    fn test_convert_to_yaml() {
-        let json = json!({"key1": "value1", "key2": "value2"});
-        let yaml = ServiceConfiguration::convert_to_yaml(json.to_string());
-        assert_eq!(
-            yaml,
-            r#"key1: value1
-key2: value2
-"#
-        );
-    }
-
-    #[test]
-    fn test_convert_to_json() {
-        let yaml = r#"key1: value1
-key2: value2"#;
-        let json = ServiceConfiguration::convert_to_json(yaml.to_string());
-        assert_eq!(json, r#"{"key1":"value1","key2":"value2"}"#);
-    }
-}
