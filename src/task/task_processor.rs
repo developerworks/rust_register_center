@@ -40,6 +40,12 @@ impl TaskProcessor {
     }
 }
 
+impl Default for TaskProcessor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[allow(unused)]
 impl InnerTaskProcessor {
     /// Initialize TaskProcess
@@ -78,4 +84,3 @@ impl InnerTaskProcessor {
             .expect("Failed to send quit message");
     }
 }
-
