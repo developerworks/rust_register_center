@@ -10,32 +10,53 @@ enum Message {
 }
 
 #[derive(Clone, Debug)]
-struct TaskProcessor {
+struct InnerTaskProcessor {
     sender: Sender<Message>,
     receiver: Receiver<Message>,
 }
 
+#[allow(unused)]
+#[derive(Clone, Debug)]
+struct TaskProcessor {
+    inner: Arc<Mutex<InnerTaskProcessor>>,
+}
+
+#[allow(unused)]
 impl TaskProcessor {
+    pub fn new() -> Self {
+        TaskProcessor {
+            inner: Arc::new(Mutex::new(InnerTaskProcessor::new())),
+        }
+    }
+
+    pub fn start(&self) {
+        let inner = self.inner.lock().unwrap();
+        inner.clone().start();
+    }
+
+    fn submit_task(&self, task: Task) {
+        let inner = self.inner.lock().unwrap();
+        inner.clone().submit_task(task);
+    }
+}
+
+#[allow(unused)]
+impl InnerTaskProcessor {
     /// Initialize TaskProcess
     fn new() -> Self {
         let (sender, receiver) = unbounded();
-        TaskProcessor { sender, receiver }
+        Self { sender, receiver }
     }
 
+    /// Start task processor
     fn start(self) {
-        // 启动工作线程
-        println!("启动工作线程");
         thread::spawn(move || {
-            println!("监听管道, 并接受消息");
             while let Ok(message) = self.receiver.recv() {
                 match message {
                     Message::Task(task) => {
-                        // 执行任务
-                        print!("消息类型: Task");
                         task();
                     }
                     Message::Quit => {
-                        print!("消息类型: Quit");
                         break;
                     }
                 }
@@ -43,41 +64,19 @@ impl TaskProcessor {
         });
     }
 
+    /// Submit task to it
     fn submit_task(&self, task: Task) {
-        // 提交任务到通道
         self.sender
             .send(Message::Task(task))
             .expect("Failed to submit task");
     }
 
+    /// Shutdown the task processor and exit the task thread
     fn shutdown(&self) {
-        // 发送退出消息到工作线程
-        // logger::info("Shutdown async task processor");
-        println!("Shutdown async task processor");
         self.sender
             .send(Message::Quit)
             .expect("Failed to send quit message");
     }
-}
-
-#[actix_web::main]
-async fn main() {
-    let async_task_processor: Arc<Mutex<TaskProcessor>> = Arc::new(Mutex::new(TaskProcessor::new()));
-    let t = async_task_processor.clone();
-    t.lock().unwrap().to_owned().start();
-    let tasks = async {
-        for i in 0..10 {
-            let task = Box::new(move || {
-                println!("Task {} executed.", i);
-            });
-            let t2 = async_task_processor.clone();
-            t2.lock().unwrap().submit_task(task);
-        }
-    };
-    let shutdown = async {
-        async_task_processor.clone().lock().unwrap().shutdown();
-    };
-    futures::join!(tasks, shutdown);
 }
 
 #[cfg(test)]
@@ -87,14 +86,16 @@ mod tests {
 
     #[test]
     fn test_async_task_processor() {
-        // 创建异步任务处理器
+    
+        // Create task processor
         let task_processor = TaskProcessor::new();
 
         let task_processor_t = task_processor.clone();
-        // 启动任务处理线程
+        
+        // Start task processor
         task_processor_t.start();
 
-        // 提交一些任务
+        // Submit some tasks
         let (tx, rx) = channel();
         for i in 0..10 {
             let tx = tx.clone();
@@ -103,10 +104,11 @@ mod tests {
                 tx.send(()).unwrap();
             });
             let processor = task_processor.clone();
-            processor.submit_task(task);
+            // processor.submit_task(task);
+            processor.submit_task(task)
         }
 
-        // 等待所有任务完成
+        // Waiting for task finish
         for _ in 0..10 {
             rx.recv().unwrap();
         }
