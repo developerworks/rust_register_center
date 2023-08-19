@@ -1,5 +1,5 @@
 use crossbeam_channel::{unbounded, Receiver, Sender};
-use futures;
+use std::sync::Arc;
 use std::thread;
 
 type Task = Box<dyn FnOnce() + Send + 'static>;
@@ -9,13 +9,14 @@ enum Message {
     Quit,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct TaskProcessor {
     sender: Sender<Message>,
     receiver: Receiver<Message>,
 }
 
 impl TaskProcessor {
+    /// Initialize TaskProcess
     fn new() -> Self {
         let (sender, receiver) = unbounded();
         TaskProcessor { sender, receiver }
@@ -30,11 +31,11 @@ impl TaskProcessor {
                 match message {
                     Message::Task(task) => {
                         // 执行任务
-                        println!("消息类型: Task");
+                        print!("消息类型: Task");
                         task();
                     }
                     Message::Quit => {
-                        println!("消息类型: Quit");
+                        print!("消息类型: Quit");
                         break;
                     }
                 }
@@ -62,11 +63,26 @@ impl TaskProcessor {
 #[actix_web::main]
 async fn main() {
     // 创建异步任务处理器
-    let async_task_processor = TaskProcessor::new();
+    // let async_task_processor = Arc::new(Mutex::new(TaskProcessor::new()));
+
+    let async_task_processor = Arc::new(TaskProcessor::new());
 
     // 启动任务处理线程
     let t = async_task_processor.clone();
-    t.start();
+
+    let t = Arc::try_unwrap(t).unwrap();
+    let _handle = thread::spawn(move || {
+        t.start();
+    });
+
+    // 提交一些任务
+    for i in 0..10 {
+        let task = Box::new(move || {
+            println!("Task {} executed.", i);
+        });
+        let t2 = async_task_processor.clone();
+        t2.submit_task(task);
+    }
 
     let tasks = async {
         // 提交一些任务
@@ -79,7 +95,7 @@ async fn main() {
         }
     };
     // 等待一段时间，确保所有任务都被处理
-    thread::sleep(std::time::Duration::from_secs(2));
+    // thread::sleep(std::time::Duration::from_secs(2));
 
     // 关闭任务处理器
     let shutdown = async {
