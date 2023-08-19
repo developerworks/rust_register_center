@@ -1,57 +1,92 @@
-use std::thread;
 use crossbeam_channel::{unbounded, Receiver, Sender};
+use futures;
+use std::thread;
 
-// 定义一个任务类型，这里用简单的闭包来代表一个任务
 type Task = Box<dyn FnOnce() + Send + 'static>;
 
-// 定义一个异步任务处理器
-#[derive(Clone)]
-struct AsyncTaskProcessor {
-    sender: Sender<Task>,
-    receiver: Receiver<Task>,
+enum Message {
+    Task(Task),
+    Quit,
 }
 
-impl AsyncTaskProcessor {
+#[derive(Clone)]
+struct TaskProcessor {
+    sender: Sender<Message>,
+    receiver: Receiver<Message>,
+}
+
+impl TaskProcessor {
     fn new() -> Self {
         let (sender, receiver) = unbounded();
-        AsyncTaskProcessor { sender, receiver }
+        TaskProcessor { sender, receiver }
     }
 
     fn start(self) {
-        // 启动处理任务的线程
+        // 启动工作线程
+        println!("启动工作线程");
         thread::spawn(move || {
-            while let Ok(task) = self.receiver.recv() {
-                // 执行任务
-                task();
+            println!("监听管道, 并接受消息");
+            while let Ok(message) = self.receiver.recv() {
+                match message {
+                    Message::Task(task) => {
+                        // 执行任务
+                        println!("消息类型: Task");
+                        task();
+                    }
+                    Message::Quit => {
+                        println!("消息类型: Quit");
+                        break;
+                    }
+                }
             }
         });
     }
 
-    fn submit_task(&mut self, task: Task) {
+    fn submit_task(&self, task: Task) {
         // 提交任务到通道
-        self.sender.send(task).expect("Failed to submit task");
+        self.sender
+            .send(Message::Task(task))
+            .expect("Failed to submit task");
+    }
+
+    fn shutdown(&self) {
+        // 发送退出消息到工作线程
+        // logger::info("Shutdown async task processor");
+        println!("Shutdown async task processor");
+        self.sender
+            .send(Message::Quit)
+            .expect("Failed to send quit message");
     }
 }
 
-fn main() {
+#[actix_web::main]
+async fn main() {
     // 创建异步任务处理器
-    let async_task_processor = AsyncTaskProcessor::new();
+    let async_task_processor = TaskProcessor::new();
 
-    let async_task_processor1 = async_task_processor.clone();
     // 启动任务处理线程
-    async_task_processor1.start();
+    let t = async_task_processor.clone();
+    t.start();
 
-    // 提交一些任务
-    for i in 0..10 {
-        let task = Box::new(move || {
-            println!("Task {} executed.", i);
-        });
-        let mut async_task_processor2 = async_task_processor.clone();
-        async_task_processor2.submit_task(task);
-    }
-
+    let tasks = async {
+        // 提交一些任务
+        for i in 0..10 {
+            let task = Box::new(move || {
+                println!("Task {} executed.", i);
+            });
+            let t2 = async_task_processor.clone();
+            t2.submit_task(task);
+        }
+    };
     // 等待一段时间，确保所有任务都被处理
     thread::sleep(std::time::Duration::from_secs(2));
+
+    // 关闭任务处理器
+    let shutdown = async {
+        async_task_processor.shutdown();
+    };
+
+    futures::join!(tasks, shutdown);
 }
 
 #[cfg(test)]
@@ -62,11 +97,11 @@ mod tests {
     #[test]
     fn test_async_task_processor() {
         // 创建异步任务处理器
-        let async_task_processor = AsyncTaskProcessor::new();
+        let task_processor = TaskProcessor::new();
 
-        let async_task_processor_t = async_task_processor.clone();
+        let task_processor_t = task_processor.clone();
         // 启动任务处理线程
-        async_task_processor_t.start();
+        task_processor_t.start();
 
         // 提交一些任务
         let (tx, rx) = channel();
@@ -76,7 +111,7 @@ mod tests {
                 println!("Task {} executed.", i);
                 tx.send(()).unwrap();
             });
-            let mut processor = async_task_processor.clone();
+            let processor = task_processor.clone();
             processor.submit_task(task);
         }
 
