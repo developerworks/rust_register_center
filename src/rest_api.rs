@@ -1,35 +1,44 @@
 // filename: server.rs
 
-use std::sync::{Arc, RwLock};
+use std::sync::RwLock;
 
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{get, post, web, Responder};
 
 use crate::{
-    discovery::ServiceDiscovery,
+    // discovery::ServiceDiscovery,
     registry::{Registry, ServiceInstance},
     store::Store,
 };
 
 #[post("/registry")]
 async fn register(
-    registry: web::Data<Arc<RwLock<Registry>>>,
+    registry: web::Data<RwLock<Registry>>,
     instance: web::Json<ServiceInstance>,
 ) -> impl Responder {
-    let mut registry = registry.write().unwrap();
-
     let instance = instance.into_inner();
+    {
+        registry.write().unwrap().register(instance.clone());
+    }
+    web::Json(instance)
+}
 
-    registry.register(instance);
-
-    HttpResponse::Ok().finish()
+#[get("/registries")]
+async fn query_all(registry: web::Data<RwLock<Registry>>,) -> impl Responder {
+    let r = registry.read().unwrap().services.clone();
+    web::Json(r)
 }
 
 #[get("/registry/{name}")]
-async fn query(discovery: web::Data<ServiceDiscovery>, name: web::Path<String>) -> impl Responder {
-    let instances = discovery.query(&name);
+async fn query(registry: web::Data<RwLock<Registry>>, name: web::Path<String>) -> impl Responder {
 
+    println!("service name: {}", name);
+    // let instances = discovery.query(&name);
+    let instances = registry.read().unwrap().query(&name);
+    println!("service instances: {:?}", instances);
     web::Json(instances)
 }
+
+
 
 // 配置获取接口
 #[get("/config/{service}/{key}")]

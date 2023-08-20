@@ -10,7 +10,7 @@ fn test_load_config_ok() {
     let config_file = vec![PROJECT_ROOT, CONFIG_FILE].join("/").to_string();
     println!("config: {}", config_file);
     let config = load_config(&config_file).unwrap();
-    assert_eq!(config.host, "localhost");
+    assert_eq!(config.host, "0.0.0.0");
 }
 
 #[test]

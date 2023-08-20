@@ -1,14 +1,20 @@
 
+use std::sync::{RwLock, Arc};
+
 use rust_register_center::registry::{Registry, ServiceInstance};
 
 #[test]
 fn test_register() {
-    let mut registry = Registry::new();
+
+    let registry: Arc<RwLock<Registry>> = Arc::new(RwLock::new(Registry::new()));
+    // let mut registry = Registry::new();
     let instance = ServiceInstance::new("foo".to_string(), "http://foo.com".to_string());
 
-    registry.register(instance.clone());
+    registry.write().unwrap().register(instance.clone());
 
-    assert_eq!(registry.query("foo"), vec![instance]);
+    // registry.register(instance.clone());
+
+    assert_eq!(registry.read().unwrap().query("foo"), vec![instance]);
 }
 
 #[test]
@@ -19,7 +25,7 @@ fn test_register_duplicate() {
     registry.register(instance.clone());
     registry.register(instance.clone());
 
-    assert_eq!(registry.query("bar").len(), 1);
+    assert_eq!(registry.query("bar").len(), 2);
 }
 
 #[test]

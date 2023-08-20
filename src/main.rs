@@ -10,13 +10,20 @@ mod service_configuration;
 mod store;
 mod task;
 
+use std::sync::RwLock;
+
 use actix_web::{web, App, HttpServer};
 use futures::join;
+use log::LevelFilter;
+use registry::Registry;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // Initialize logger
-    logger::init_logger();
+    // logger::init_logger();
+    env_logger::builder()
+        .filter_level(LevelFilter::Debug)
+        .init();
 
     // Load config
     let config = load_config();
@@ -27,15 +34,22 @@ async fn main() -> std::io::Result<()> {
 
     // Initialize the HttpServer
     let server = HttpServer::new(move || {
-        let discovery = discovery::ServiceDiscovery::new(registry::Registry::new());
+        
+        let registry_data: RwLock<Registry> = RwLock::new(Registry::new());
+        // let registry_data = Registry::new();
+        // let discovery = discovery::ServiceDiscovery::new(registry_data);
+
+        
         App::new()
+            .app_data(web::Data::new(registry_data))
             .app_data(web::Data::new(config_clone.clone()))
-            .app_data(web::Data::new(discovery))
+            // .app_data(web::Data::new(discovery))
             .app_data(web::Data::new(store::Store::new()))
             .app_data(web::Data::new(events::default::Events::new))
             .service(rest_api::register)
             .service(rest_api::query)
             .service(rest_api::get_config)
+            .service(rest_api::query_all)
     })
     .bind(host)?;
 

@@ -1,4 +1,12 @@
-use rust_register_center::{registry::{Registry, ServiceInstance}, discovery::ServiceDiscovery};
+use std::{
+    collections::HashMap,
+    sync::{Arc, RwLock},
+};
+
+use rust_register_center::{
+    discovery::ServiceDiscovery,
+    registry::{Registry, ServiceInstance},
+};
 
 #[test]
 fn test_query_by_name() {
@@ -19,7 +27,9 @@ fn test_query_by_name() {
 #[test]
 fn test_query_not_found() {
     let discovery = ServiceDiscovery {
-        registry: Registry::new(),
+        registry: Registry {
+            services: Arc::new(RwLock::new(HashMap::new())),
+        },
     };
 
     let instances = discovery.query("unknown");

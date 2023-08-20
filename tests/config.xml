@@ -1,6 +1,6 @@
 <config>
-  <host>localhost</host>
-  <port>8080</port>
+  <host>0.0.0.0</host>
+  <port>10099</port>
   <database>
     <url>mysql:jdbc:://localhost:3306/test?</url>
     <user>root</user>
