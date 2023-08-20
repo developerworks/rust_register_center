@@ -1,44 +1,38 @@
 // filename: server.rs
 
-use std::sync::RwLock;
-
 use actix_web::{get, post, web, Responder};
 
 use crate::{
     // discovery::ServiceDiscovery,
-    registry::{Registry, ServiceInstance},
-    store::Store,
+    registry::ServiceInstance,
+    store::{ServiceConfigValue, Store},
+    AppState,
 };
 
 #[post("/registry")]
 async fn register(
-    registry: web::Data<RwLock<Registry>>,
+    app_state: web::Data<AppState>,
     instance: web::Json<ServiceInstance>,
 ) -> impl Responder {
-    let instance = instance.into_inner();
-    {
-        registry.write().unwrap().register(instance.clone());
-    }
+    let registry = &app_state.registry;
+    let instance: ServiceInstance = instance.into_inner();
+    registry.lock().unwrap().register(instance.clone());
     web::Json(instance)
 }
 
 #[get("/registries")]
-async fn query_all(registry: web::Data<RwLock<Registry>>,) -> impl Responder {
-    let r = registry.read().unwrap().services.clone();
+async fn query_all(app_state: web::Data<AppState>) -> impl Responder {
+    let registry = &app_state.registry;
+    let r = registry.lock().unwrap().services.clone();
     web::Json(r)
 }
 
 #[get("/registry/{name}")]
-async fn query(registry: web::Data<RwLock<Registry>>, name: web::Path<String>) -> impl Responder {
-
-    println!("service name: {}", name);
-    // let instances = discovery.query(&name);
-    let instances = registry.read().unwrap().query(&name);
-    println!("service instances: {:?}", instances);
+async fn query(app_state: web::Data<AppState>, name: web::Path<String>) -> impl Responder {
+    let registry = &app_state.registry;
+    let instances: Vec<ServiceInstance> = registry.lock().unwrap().query(&name);
     web::Json(instances)
 }
-
-
 
 // 配置获取接口
 #[get("/config/{service}/{key}")]
@@ -47,7 +41,7 @@ async fn get_config(
     service: web::Path<String>,
     key: web::Path<String>,
 ) -> impl Responder {
-    let value = store.get(&service, &key);
+    let value: Option<ServiceConfigValue> = store.get(&service, &key);
 
     match value {
         Some(value) => web::Json(value),

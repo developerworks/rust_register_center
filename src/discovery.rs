@@ -12,6 +12,7 @@ impl ServiceDiscovery {
         Self { registry }
     }
 
+    #[allow(unused)]
     pub fn register(&mut self, service_instance: ServiceInstance) {
         self.registry.register(service_instance);
     }

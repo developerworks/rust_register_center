@@ -37,7 +37,7 @@ impl Store {
     pub fn get(&self, service: &str, key: &str) -> Option<ServiceConfigValue> {
         self.configs
             .get(service)
-            .and_then(|config| config.get(key).cloned())
+            .and_then(|config: &HashMap<String, ServiceConfigValue>| config.get(key).cloned())
     }
 
     /// 保存配置值

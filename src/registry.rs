@@ -57,8 +57,8 @@ impl Registry {
     /// Register a service instance
     #[allow(unused)]
     pub fn register(&mut self, service_instance: ServiceInstance) {
-        let service_name = service_instance.name.clone();
-        let mut services = self.services.write().unwrap();
+        let service_name: String = service_instance.name.clone();
+        let mut services: std::sync::RwLockWriteGuard<'_, HashMap<String, Vec<ServiceInstance>>> = self.services.write().unwrap();
         if let Some(instances) = services.get_mut(&service_name) {
             instances.push(service_instance);
         } else {
@@ -71,10 +71,10 @@ impl Registry {
     pub fn query(&self, name: &str) -> Vec<ServiceInstance> {
         println!("### Query service instances by service name");
 
-        let services = self.services.read().unwrap();
+        let services: std::sync::RwLockReadGuard<'_, HashMap<String, Vec<ServiceInstance>>> = self.services.read().unwrap();
         println!("### self.services {:?}", services);
 
-        let r = if let Some(instances) = services.get(name) {
+        let r: Vec<ServiceInstance> = if let Some(instances) = services.get(name) {
             println!("Query service {:?}", instances);
             instances.to_vec()
         } else {

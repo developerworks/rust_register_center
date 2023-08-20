@@ -30,12 +30,12 @@ impl TaskProcessor {
     }
 
     pub fn start(&self) {
-        let inner = self.inner.lock().unwrap();
+        let inner: std::sync::MutexGuard<'_, InnerTaskProcessor> = self.inner.lock().unwrap();
         inner.clone().start();
     }
 
     pub fn submit_task(&self, task: Task) {
-        let inner = self.inner.lock().unwrap();
+        let inner: std::sync::MutexGuard<'_, InnerTaskProcessor> = self.inner.lock().unwrap();
         inner.clone().submit_task(task);
     }
 }
