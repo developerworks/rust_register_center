@@ -1,8 +1,15 @@
 // filename: store.rs
 
+pub mod mysql;
+// pub mod redis;
+
 use std::collections::HashMap;
 
-#[derive(serde::Serialize)]
+use serde::{Deserialize, Serialize};
+
+// pub use mysql::MysqlStore;
+
+#[derive(Serialize, Deserialize, Debug)]
 pub enum ServiceConfigValue {
     String(String),
     Int(i64),

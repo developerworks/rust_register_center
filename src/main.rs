@@ -16,6 +16,7 @@ use actix_web::{web, App, HttpServer};
 use futures::join;
 use log::LevelFilter;
 use registry::Registry;
+use store::mysql::MysqlStore;
 
 #[allow(unused)]
 pub struct AppState {
@@ -39,6 +40,8 @@ async fn main() -> std::io::Result<()> {
     let app_state: web::Data<AppState> = web::Data::new(AppState {
         registry: Mutex::new(Registry::new()),
     });
+
+    
     // let discovery = discovery::ServiceDiscovery::new(registry_data);
     // Initialize the HttpServer
     let server = HttpServer::new(move || {
@@ -58,7 +61,17 @@ async fn main() -> std::io::Result<()> {
     // Start the server
     let future_server = async { server.run().await };
     let future_on_start = async { on_start(config.clone()) };
-    let _result = join!(future_server, future_on_start);
+
+    let future_mysql_test = async {
+        let mysql_store = MysqlStore::new().await.unwrap();
+        let rows = mysql_store.get("service", "key");
+        
+    };
+    let _result = join!(
+        future_server, 
+        future_on_start,
+        future_mysql_test
+    );
 
     Ok(())
 }
