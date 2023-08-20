@@ -8,7 +8,7 @@ use std::fs;
 pub use struct_defs::Config;
 
 // #[allow(unused)]
-pub static CONFIG_FILE: &str = "tests/config.xml";
+pub static CONFIG_FILE: &str = "tests/resources/config.xml";
 
 // #[allow(unused)]
 pub static PROJECT_ROOT: &str = env!("CARGO_MANIFEST_DIR");

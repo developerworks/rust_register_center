@@ -5,8 +5,8 @@ use std::fs;
 
 use rust_register_center::config::Config;
 
-pub static CONFIG_FILE: &str = "tests/config.xml";
-pub static CONFIG_FILE_UNEXPECTED_END_OF_STREAM: &str = "tests/config_unexpected_end_of_stream.xml";
+pub static CONFIG_FILE: &str = "tests/resources/config.xml";
+pub static CONFIG_FILE_UNEXPECTED_END_OF_STREAM: &str = "tests/resources/config_unexpected_end_of_stream.xml";
 pub static PROJECT_ROOT: &str = env!("CARGO_MANIFEST_DIR");
 
 fn load_config(filename: &str) -> Result<Config, Box<dyn Error>> {

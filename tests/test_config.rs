@@ -2,7 +2,7 @@ use rust_register_center::config::{PROJECT_ROOT, CONFIG_FILE, load_config, file_
 
 // Tests for config module
 // #[allow(unused)]
-pub static CONFIG_FILE_UNEXPECTED_END_OF_STREAM: &str = "tests/config_unexpected_end_of_stream.xml";
+pub static CONFIG_FILE_UNEXPECTED_END_OF_STREAM: &str = "tests/resources/config_unexpected_end_of_stream.xml";
 
 
 #[test]
