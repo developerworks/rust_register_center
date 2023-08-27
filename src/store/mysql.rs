@@ -71,7 +71,6 @@ impl MysqlStore {
                 url: x.url.clone(),
             })
             .collect::<Vec<MicroService>>();
-        println!("{:?}", a);
         a
     }
 

@@ -2,13 +2,18 @@ use std::collections::HashMap;
 
 type EventHandler = Box<dyn Fn()>;
 
-struct EventBus {
+pub struct EventBus {
     event_handlers: HashMap<String, Vec<EventHandler>>,
 }
 
 #[allow(unused)]
 impl EventBus {
 
+    ///
+    /// Adds a handler for the given event.
+    /// ```rust
+    /// let event_bus = EventBus::new();
+    /// ```
     fn new() -> Self {
         EventBus {
             event_handlers: HashMap::new(),

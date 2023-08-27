@@ -14,8 +14,12 @@ pub struct ServiceInstance {
 }
 
 impl ServiceInstance {
-
-    #[allow(unused)]
+    /// Initialize a new service instance
+    /// ```rust
+    ///
+    /// let service = ServiceInstance::new("example".to_string(), "https://example.com/api".to_string());
+    /// ```
+    // #[allow(unused)]
     pub fn new(name: String, url: String) -> Self {
         Self {
             name,
@@ -24,7 +28,15 @@ impl ServiceInstance {
         }
     }
 
-    #[allow(unused)]
+    /// Add metadata to the service instance
+    ///
+    ///
+    /// ```rust
+    ///
+    /// let service = ServiceInstance::new("example".to_string(), "https://example.com/api".to_string())
+    ///     .with_metadata(HashMap::from([("key".to_string(), "value".to_string())]));
+    /// ```
+    // #[allow(unused)]
     pub fn with_metadata(self, metadata: HashMap<String, String>) -> Self {
         Self {
             name: self.name,

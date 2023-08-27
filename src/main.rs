@@ -64,7 +64,11 @@ async fn main() -> std::io::Result<()> {
 
     let future_mysql_test = async {
         let mysql_store = MysqlStore::new().await.unwrap();
-        let rows = mysql_store.get("service", "key");
+        let rows = mysql_store.get("service_name_1", "service_url_1").await;
+
+        for row in rows {
+            println!("{:?}", row);
+        }
         
     };
     let _result = join!(

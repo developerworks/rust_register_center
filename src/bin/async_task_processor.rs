@@ -22,6 +22,12 @@ impl TaskProcessor {
         TaskProcessor { sender, receiver }
     }
 
+    /// Start task processor
+    /// ```rust
+    /// #[cfg(test)]
+    ///
+    /// let processor = TaskProcessor::new();
+    /// ```
     fn start(self) {
         // 启动工作线程
         println!("启动工作线程");
