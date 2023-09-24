@@ -88,7 +88,7 @@ fn on_start(config: config::Config) -> std::io::Result<()> {
 
 /// Load config
 fn load_config() -> config::Config {
-    let config_file = vec![config::PROJECT_ROOT, config::CONFIG_FILE]
+    let config_file = [config::PROJECT_ROOT, config::CONFIG_FILE]
         .join("/")
         .to_string();
     println!("config: {}", config_file);
